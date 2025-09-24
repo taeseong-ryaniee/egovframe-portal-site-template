@@ -104,3 +104,23 @@
 3. [템플릿 구성 및 환경설정](https://www.egovframe.go.kr/wiki/doku.php?id=egovframework:let4:configration) 문서를 참고하여 템플릿 환경설정을 수행한다.
 
 4. 실행할 프로젝트를 마우스 우클릭하고 **Run As > Run on Server** 를 선택한다.
+
+# eGovFrame Portal Site Template
+
+[![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)]()
+
+## Quickstart
+
+```bash
+# 1) Clone (your fork)
+git clone https://github.com/gogoleelee88/egovframe-portal-site-template.git
+cd egovframe-portal-site-template
+
+# 2) Build
+mvn clean package
+
+# 3) Run (예: 임베디드 톰캣/와스 환경에 맞게)
+# mvn spring-boot:run  # (spring-boot 사용 시)
+# 또는 IDE에서 서버 실행 후 http://localhost:8080 접속
+
