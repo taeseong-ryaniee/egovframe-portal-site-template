@@ -23,6 +23,7 @@ sed -E \
   -e 's/\r$//' \
   -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \1;/' \
   -e 's/varchar2\(/varchar(/Ig' \
+  -e 's/number\(([0-9]+)\)/decimal(\1,0)/Ig' \
   -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\1,\2)/Ig' \
   -e 's/ DATE([ ,\n])/ datetime\1/Ig' \
   -e 's/ CLOB/ longtext/Ig' \
@@ -44,4 +45,3 @@ echo "[INIT] Loading seed data..."
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DATA"
 
 echo "[INIT] Done."
-
