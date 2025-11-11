@@ -80,11 +80,19 @@
             <property name="allowSemicolon" value="true"/>
         </bean>
         <security:http-firewall ref="egovStrictHttpFirewall"/>
-    </beans>
+</beans>
 
     <!-- 보안 메타데이터 초기화(DB 조회) 별도 수행 -->
     <beans profile="security-init">
         <egov-security:initializer id="initializer" supportMethod="true" supportPointcut="false" />
+    </beans>
+
+    <!-- 개발용 전면 허용 프로파일: 인증/인가 미적용, CSRF 비활성화 -->
+    <beans profile="security-dev">
+        <security:http auto-config="true" use-expressions="true">
+            <security:csrf disabled="true"/>
+            <security:intercept-url pattern="/**" access="permitAll"/>
+        </security:http>
     </beans>
 
 </beans>
