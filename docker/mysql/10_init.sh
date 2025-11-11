@@ -29,7 +29,6 @@ sed -E \
   -e 's/ CLOB/ longtext/Ig' \
   -e 's/ BLOB/ longblob/Ig' \
   -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
-  -e 's/CREATE OR REPLACE VIEW/CREATE VIEW IF NOT EXISTS/Ig' \
   "$SRC_DDL" > "$OUT_DDL"
 
 # Ensure statements end with semicolons where needed (best-effort)
@@ -46,9 +45,11 @@ awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" 
 cp "$SRC_DATA" "$OUT_DATA"
 
 echo "[INIT] Loading schema into database: $MYSQL_DATABASE"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DDL"
 
 echo "[INIT] Loading seed data..."
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DATA"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 
 echo "[INIT] Done."

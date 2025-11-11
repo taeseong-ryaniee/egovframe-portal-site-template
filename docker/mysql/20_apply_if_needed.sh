@@ -39,7 +39,6 @@ sed -E \
   -e 's/ CLOB/ longtext/Ig' \
   -e 's/ BLOB/ longblob/Ig' \
   -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
-  -e 's/CREATE OR REPLACE VIEW/CREATE VIEW IF NOT EXISTS/Ig' \
   "${SRC_DDL}" > "${OUT_DDL}"
 
 # Disable FK checks while dropping/creating to avoid order issues
@@ -52,9 +51,11 @@ sed -E \
 cp "${SRC_DATA}" "${OUT_DATA}"
 
 echo "[DB-INIT] Loading schema into ${MYSQL_DATABASE}..."
+mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DDL}"
 
 echo "[DB-INIT] Loading seed data into ${MYSQL_DATABASE}..."
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DATA}"
+mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 
 echo "[DB-INIT] Done."
