@@ -5,6 +5,9 @@
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!-- Ensure property service bean is loaded in root context -->
+    <import resource="classpath*:egovframework/spring/com/context-properties.xml"/>
+
     <!-- component-scan 설정: Service/Repository/Component 스캔, Controller는 제외 -->
 	<context:component-scan base-package="egovframework">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
