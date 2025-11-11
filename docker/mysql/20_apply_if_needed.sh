@@ -7,7 +7,7 @@ MYSQL_HOST=${MYSQL_HOST:-mysql}
 MYSQL_DATABASE=${MYSQL_DATABASE:-pst}
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-rootpw}
 
-SRC_DDL="/init/src/all_pst_ddl_oracle.sql"
+SRC_DDL="/init/src/all_pst_ddl_mysql.sql"
 SRC_DATA="/init/src/all_pst_data_mysql.sql"
 OUT_DDL="/tmp/01_schema_mysql.sql"
 OUT_DATA="/tmp/02_data_mysql.sql"
@@ -28,21 +28,9 @@ if [[ ! -f "${SRC_DDL}" ]] || [[ ! -f "${SRC_DATA}" ]]; then
   exit 1
 fi
 
-echo "[DB-INIT] Transforming Oracle DDL to MySQL compatible SQL..."
-sed -E \
-  -e 's/\r$//' \
-  -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \1;/' \
-  -e 's/varchar2\(/varchar(/Ig' \
-  -e 's/number\(([0-9]+)\)/decimal(\1,0)/Ig' \
-  -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\1,\2)/Ig' \
-  -e 's/ DATE([ ,\n])/ datetime\1/Ig' \
-  -e 's/ CLOB/ longtext/Ig' \
-  -e 's/ BLOB/ longblob/Ig' \
-  -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
-  -e 's/CREATE OR REPLACE VIEW/CREATE VIEW IF NOT EXISTS/Ig' \
-  "${SRC_DDL}" > "${OUT_DDL}"
-
-cp "${SRC_DATA}" "${OUT_DATA}"
+echo "[DB-INIT] Using provided MySQL DDL/DATA..."
+sed -E 's/\r$//' "${SRC_DDL}" > "${OUT_DDL}"
+sed -E 's/\r$//' "${SRC_DATA}" > "${OUT_DATA}"
 
 echo "[DB-INIT] Loading schema into ${MYSQL_DATABASE}..."
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DDL}"

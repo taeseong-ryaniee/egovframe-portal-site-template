@@ -19,7 +19,7 @@ services:
       # Init script that converts Oracle DDL to MySQL and loads data
       - ./docker/mysql/10_init.sh:/docker-entrypoint-initdb.d/10_init.sh:ro
       # Source DDL/DATA files (mounted under src to avoid auto-exec)
-      - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/docker-entrypoint-initdb.d/src/all_pst_ddl_oracle.sql:ro
+      - ./DATABASE/mysql/all_pst_ddl_mysql.sql:/docker-entrypoint-initdb.d/src/all_pst_ddl_mysql.sql:ro
       - ./DATABASE/mysql/all_pst_data_mysql.sql:/docker-entrypoint-initdb.d/src/all_pst_data_mysql.sql:ro
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
@@ -73,7 +73,7 @@ services:
     command: ["bash","-lc","bash /init/20_apply_if_needed.sh"]
     volumes:
       - ./docker/mysql/20_apply_if_needed.sh:/init/20_apply_if_needed.sh:ro
-      - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/init/src/all_pst_ddl_oracle.sql:ro
+      - ./DATABASE/mysql/all_pst_ddl_mysql.sql:/init/src/all_pst_ddl_mysql.sql:ro
       - ./DATABASE/mysql/all_pst_data_mysql.sql:/init/src/all_pst_data_mysql.sql:ro
     restart: "no"
     networks:
