@@ -1,10 +1,8 @@
-version: "3.8"
-
 services:
   mysql:
     image: mysql:8.0
     container_name: pst_mysql
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    command: ["mysqld", "--host_cache_size=0", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-pst}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpw}
@@ -42,8 +40,9 @@ services:
       JAVA_OPTS: ${JAVA_OPTS:-"-Xms256m -Xmx1024m -Dfile.encoding=UTF-8"}
     volumes:
       - upload_data:/user/file/sht/
-    ports:
-      - "8080:8080"
+    # No host port mapping; Dokploy ingress/front proxy should route to 8080
+    expose:
+      - "8080"
     restart: unless-stopped
 
   apache:
@@ -51,8 +50,9 @@ services:
     container_name: pst_apache
     depends_on:
       - tomcat
-    ports:
-      - "80:80"
+    # No host port mapping; Dokploy ingress/front proxy should route to 80
+    expose:
+      - "80"
     volumes:
       - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
     restart: unless-stopped
