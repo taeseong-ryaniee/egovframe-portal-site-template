@@ -18,4 +18,8 @@
         <property name="username" value="${Globals.UserName}"/>
         <property name="password" value="${Globals.Password}"/>
     </bean>
+
+    <!-- 호환성 별칭: 일부 설정에서 dataSource 또는 dataSource-${Globals.DbType} 이름을 기대함 -->
+    <alias name="egov.dataSource" alias="dataSource"/>
+    <alias name="egov.dataSource" alias="dataSource-mysql"/>
 </beans>
