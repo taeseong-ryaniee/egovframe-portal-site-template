@@ -72,6 +72,11 @@ mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < 
 
 echo "[DB-INIT] Loading seed data into ${MYSQL_DATABASE}..."
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DATA}"
+
+if [[ -f "/init/src/post_init_mysql.sql" ]]; then
+  echo "[DB-INIT] Applying post-init MySQL SQL..."
+  mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "/init/src/post_init_mysql.sql"
+fi
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 
 echo "[DB-INIT] Done."

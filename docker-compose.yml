@@ -21,6 +21,7 @@ services:
       # Source DDL/DATA files (mounted under src to avoid auto-exec)
       - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/docker-entrypoint-initdb.d/src/all_pst_ddl_oracle.sql:ro
       - ./DATABASE/mysql/all_pst_data_mysql.sql:/docker-entrypoint-initdb.d/src/all_pst_data_mysql.sql:ro
+      - ./DATABASE/mysql/post_init_mysql.sql:/docker-entrypoint-initdb.d/src/post_init_mysql.sql:ro
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
     # 초기 스키마/데이터 자동 적용
@@ -75,6 +76,7 @@ services:
       - ./docker/mysql/20_apply_if_needed.sh:/init/20_apply_if_needed.sh:ro
       - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/init/src/all_pst_ddl_oracle.sql:ro
       - ./DATABASE/mysql/all_pst_data_mysql.sql:/init/src/all_pst_data_mysql.sql:ro
+      - ./DATABASE/mysql/post_init_mysql.sql:/init/src/post_init_mysql.sql:ro
     restart: "no"
     networks:
       - appnet

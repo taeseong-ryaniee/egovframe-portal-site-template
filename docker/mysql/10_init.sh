@@ -65,6 +65,11 @@ mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DDL"
 
 echo "[INIT] Loading seed data..."
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DATA"
+
+if [[ -f "/docker-entrypoint-initdb.d/src/post_init_mysql.sql" ]]; then
+  echo "[INIT] Applying post-init MySQL SQL..."
+  mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "/docker-entrypoint-initdb.d/src/post_init_mysql.sql"
+fi
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 
 echo "[INIT] Done."
