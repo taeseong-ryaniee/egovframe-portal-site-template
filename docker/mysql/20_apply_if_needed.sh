@@ -45,6 +45,14 @@ sed -E \
 sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}" 2>/dev/null || \
 sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}"
 
+# Remove DROP TABLE lines to avoid FK dependency issues
+sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}" 2>/dev/null || \
+sed -E -i '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}"
+
+# Make table creation idempotent
+sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}" 2>/dev/null || \
+sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}"
+
 # Disable FK checks while dropping/creating to avoid order issues
 {
   echo "SET FOREIGN_KEY_CHECKS=0;";

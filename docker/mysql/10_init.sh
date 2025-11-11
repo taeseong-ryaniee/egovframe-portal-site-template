@@ -35,6 +35,14 @@ sed -E \
 sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL" 2>/dev/null || \
 sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL"
 
+# Remove DROP TABLE lines to avoid FK dependency issues
+sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL" 2>/dev/null || \
+sed -E -i '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL"
+
+# Make table creation idempotent
+sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL" 2>/dev/null || \
+sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL"
+
 # Ensure statements end with semicolons where needed (best-effort)
 awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
 
