@@ -8,6 +8,7 @@ import egovframework.let.utl.sim.service.EgovFileScrty;
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 
 import javax.annotation.Resource;
+import org.springframework.core.env.Environment;
 
 import org.springframework.stereotype.Service;
 /**
@@ -34,6 +35,9 @@ public class EgovLoginServiceImpl extends EgovAbstractServiceImpl implements
     @Resource(name="loginDAO")
     private LoginDAO loginDAO;
 
+    @Resource
+    private Environment environment;
+
     /**
 	 * 일반 로그인을 처리한다
 	 * @param vo LoginVO
@@ -49,6 +53,12 @@ public class EgovLoginServiceImpl extends EgovAbstractServiceImpl implements
 
     	// 2. 아이디와 암호화된 비밀번호가 DB와 일치하는지 확인한다.
     	LoginVO loginVO = loginDAO.actionLogin(vo);
+
+    	// dev 프로파일(security-dev)에서는 비밀번호 미일치 시 완화 로그인 시도(아이디+상태만)
+    	if ((loginVO == null || EgovStringUtil.isEmpty(loginVO.getId())) && environment != null
+    	        && environment.acceptsProfiles("security-dev")) {
+    		loginVO = loginDAO.actionLoginDevRelaxed(vo);
+    	}
 
     	// 3. 결과를 리턴한다.
     	if (loginVO != null && !loginVO.getId().equals("") && !loginVO.getPassword().equals("")) {

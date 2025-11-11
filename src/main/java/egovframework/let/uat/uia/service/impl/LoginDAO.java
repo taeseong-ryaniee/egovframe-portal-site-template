@@ -31,7 +31,11 @@ public class LoginDAO extends EgovAbstractMapper {
 	 * @exception Exception
 	 */
     public LoginVO actionLogin(LoginVO vo) throws Exception {
-    	return (LoginVO)selectOne("loginDAO.actionLogin", vo);
+   	return (LoginVO)selectOne("loginDAO.actionLogin", vo);
+    }
+
+    public LoginVO actionLoginDevRelaxed(LoginVO vo) throws Exception {
+    	return (LoginVO)selectOne("loginDAO.actionLoginDevRelaxed", vo);
     }
 
     /**
