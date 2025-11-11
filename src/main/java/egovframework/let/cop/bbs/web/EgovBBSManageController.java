@@ -22,6 +22,7 @@ import org.egovframe.rte.fdl.security.userdetails.util.EgovUserDetailsHelper;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +66,8 @@ public class EgovBBSManageController {
 	@Resource(name = "EgovBBSAttributeManageService")
 	private EgovBBSAttributeManageService bbsAttrbService;
 
-	@Resource(name = "EgovFileMngService")
-	private EgovFileMngService fileMngService;
+    @Autowired
+    private EgovFileMngService fileMngService;
 
 	@Resource(name = "EgovFileMngUtil")
 	private EgovFileMngUtil fileUtil;
