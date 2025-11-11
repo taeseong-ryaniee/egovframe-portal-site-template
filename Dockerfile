@@ -19,10 +19,9 @@ ENV TZ=Asia/Seoul \
 
 WORKDIR ${CATALINA_HOME}
 
-# Clean default ROOT and deploy our WAR both at ROOT and /pst_webapp
-RUN rm -rf webapps/ROOT
+# Deploy only as ROOT to avoid duplicated contexts
+RUN rm -rf webapps/ROOT webapps/pst_webapp.war
 COPY --from=build /app/target/pst_webapp.war webapps/ROOT.war
-COPY --from=build /app/target/pst_webapp.war webapps/pst_webapp.war
 
 # Ensure upload directory exists (mounted at runtime via volume)
 RUN mkdir -p /user/file/sht/
