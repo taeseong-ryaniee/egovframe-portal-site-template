@@ -4,6 +4,7 @@ set -euo pipefail
 echo "[INIT] Preparing schema from Oracle DDL -> MySQL..."
 
 SRC_DDL="/docker-entrypoint-initdb.d/src/all_pst_ddl_oracle.sql"
+SRC_SCHEMA_MYSQL="/docker-entrypoint-initdb.d/src/all_pst_schema_mysql.sql"
 SRC_DATA="/docker-entrypoint-initdb.d/src/all_pst_data_mysql.sql"
 OUT_DDL="/docker-entrypoint-initdb.d/01_schema_mysql.sql"
 OUT_DATA="/docker-entrypoint-initdb.d/02_data_mysql.sql"
@@ -18,40 +19,45 @@ if [[ ! -f "$SRC_DATA" ]]; then
   exit 1
 fi
 
-# Basic transform of Oracle-style DDL to MySQL-compatible DDL
-sed -E \
-  -e 's/\r$//' \
-  -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \\1;/' \
-  -e 's/varchar2\(/varchar(/Ig' \
-  -e 's/number\(([0-9]+)\)/decimal(\\1,0)/Ig' \
-  -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\\1,\\2)/Ig' \
-  -e 's/ DATE([ ,\n])/ datetime\\1/Ig' \
-  -e 's/ CLOB/ longtext/Ig' \
-  -e 's/ BLOB/ longblob/Ig' \
-  -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
-  "$SRC_DDL" > "$OUT_DDL"
+# Prefer provided MySQL schema if present; otherwise transform Oracle DDL
+if [[ -f "$SRC_SCHEMA_MYSQL" ]]; then
+  sed -E 's/\r$//' "$SRC_SCHEMA_MYSQL" > "$OUT_DDL"
+else
+  # Basic transform of Oracle-style DDL to MySQL-compatible DDL
+  sed -E \
+    -e 's/\r$//' \
+    -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \\1;/' \
+    -e 's/varchar2\(/varchar(/Ig' \
+    -e 's/number\(([0-9]+)\)/decimal(\\1,0)/Ig' \
+    -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\\1,\\2)/Ig' \
+    -e 's/ DATE([ ,\n])/ datetime\\1/Ig' \
+    -e 's/ CLOB/ longtext/Ig' \
+    -e 's/ BLOB/ longblob/Ig' \
+    -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
+    "$SRC_DDL" > "$OUT_DDL"
 
-# Ensure MySQL-compatible view syntax (just in case)
-sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL" 2>/dev/null || \
-sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL"
+  # Ensure MySQL-compatible view syntax (just in case)
+  sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL" 2>/dev/null || \
+  sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL"
 
-# Remove DROP TABLE lines to avoid FK dependency issues
-sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL" 2>/dev/null || \
-sed -E -i '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL"
+  # Remove DROP TABLE lines to avoid FK dependency issues
+  sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL" 2>/dev/null || \
+  sed -E -i '/^DROP TABLE IF EXISTS /Id' "$OUT_DDL"
 
-# Make table creation idempotent
-sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL" 2>/dev/null || \
-sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL"
+  # Make table creation idempotent
+  sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL" 2>/dev/null || \
+  sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "$OUT_DDL"
 
-# Ensure statements end with semicolons where needed (best-effort)
-awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
+  # Ensure statements end with semicolons where needed (best-effort)
+  awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
 
-# Disable FK checks while dropping/creating to avoid order issues
-{
-  echo "SET FOREIGN_KEY_CHECKS=0;";
-  cat "$OUT_DDL";
-  echo "SET FOREIGN_KEY_CHECKS=1;";
-} > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
+  # Disable FK checks while dropping/creating to avoid order issues
+  {
+    echo "SET FOREIGN_KEY_CHECKS=0;";
+    cat "$OUT_DDL";
+    echo "SET FOREIGN_KEY_CHECKS=1;";
+  } > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
+fi
 
 # Copy data script (contains MySQL-specific functions like NOW())
 cp "$SRC_DATA" "$OUT_DATA"

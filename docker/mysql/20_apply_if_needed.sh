@@ -8,6 +8,7 @@ MYSQL_DATABASE=${MYSQL_DATABASE:-pst}
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-rootpw}
 
 SRC_DDL="/init/src/all_pst_ddl_oracle.sql"
+SRC_SCHEMA_MYSQL="/init/src/all_pst_schema_mysql.sql"
 SRC_DATA="/init/src/all_pst_data_mysql.sql"
 OUT_DDL="/tmp/01_schema_mysql.sql"
 OUT_DATA="/tmp/02_data_mysql.sql"
@@ -28,37 +29,42 @@ if [[ ! -f "${SRC_DDL}" ]] || [[ ! -f "${SRC_DATA}" ]]; then
   exit 1
 fi
 
-echo "[DB-INIT] Transforming Oracle DDL to MySQL compatible SQL..."
-sed -E \
-  -e 's/\r$//' \
-  -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \1;/' \
-  -e 's/varchar2\(/varchar(/Ig' \
-  -e 's/number\(([0-9]+)\)/decimal(\1,0)/Ig' \
-  -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\1,\2)/Ig' \
-  -e 's/ DATE([ ,\n])/ datetime\1/Ig' \
-  -e 's/ CLOB/ longtext/Ig' \
-  -e 's/ BLOB/ longblob/Ig' \
-  -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
-  "${SRC_DDL}" > "${OUT_DDL}"
+if [[ -f "${SRC_SCHEMA_MYSQL}" ]]; then
+  echo "[DB-INIT] Using provided MySQL schema..."
+  sed -E 's/\r$//' "${SRC_SCHEMA_MYSQL}" > "${OUT_DDL}"
+else
+  echo "[DB-INIT] Transforming Oracle DDL to MySQL compatible SQL..."
+  sed -E \
+    -e 's/\r$//' \
+    -e 's/DROP TABLE ([A-Z0-9_]+) CASCADE CONSTRAINTS;/DROP TABLE IF EXISTS \1;/' \
+    -e 's/varchar2\(/varchar(/Ig' \
+    -e 's/number\(([0-9]+)\)/decimal(\1,0)/Ig' \
+    -e 's/number\(([0-9]+),([0-9]+)\)/decimal(\1,\2)/Ig' \
+    -e 's/ DATE([ ,\n])/ datetime\1/Ig' \
+    -e 's/ CLOB/ longtext/Ig' \
+    -e 's/ BLOB/ longblob/Ig' \
+    -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
+    "${SRC_DDL}" > "${OUT_DDL}"
 
-# Ensure MySQL-compatible view syntax
-sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}" 2>/dev/null || \
-sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}"
+  # Ensure MySQL-compatible view syntax
+  sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}" 2>/dev/null || \
+  sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}"
 
-# Remove DROP TABLE lines to avoid FK dependency issues
-sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}" 2>/dev/null || \
-sed -E -i '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}"
+  # Remove DROP TABLE lines to avoid FK dependency issues
+  sed -E -i '' '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}" 2>/dev/null || \
+  sed -E -i '/^DROP TABLE IF EXISTS /Id' "${OUT_DDL}"
 
-# Make table creation idempotent
-sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}" 2>/dev/null || \
-sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}"
+  # Make table creation idempotent
+  sed -E -i '' 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}" 2>/dev/null || \
+  sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_DDL}"
 
-# Disable FK checks while dropping/creating to avoid order issues
-{
-  echo "SET FOREIGN_KEY_CHECKS=0;";
-  cat "${OUT_DDL}";
-  echo "SET FOREIGN_KEY_CHECKS=1;";
-} > "${OUT_DDL}.tmp" && mv "${OUT_DDL}.tmp" "${OUT_DDL}"
+  # Disable FK checks while dropping/creating to avoid order issues
+  {
+    echo "SET FOREIGN_KEY_CHECKS=0;";
+    cat "${OUT_DDL}";
+    echo "SET FOREIGN_KEY_CHECKS=1;";
+  } > "${OUT_DDL}.tmp" && mv "${OUT_DDL}.tmp" "${OUT_DDL}"
+fi
 
 cp "${SRC_DATA}" "${OUT_DATA}"
 # Make IDS seed idempotent to avoid duplicate PK errors on re-runs
