@@ -35,6 +35,13 @@ sed -E \
 # Ensure statements end with semicolons where needed (best-effort)
 awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
 
+# Disable FK checks while dropping/creating to avoid order issues
+{
+  echo "SET FOREIGN_KEY_CHECKS=0;";
+  cat "$OUT_DDL";
+  echo "SET FOREIGN_KEY_CHECKS=1;";
+} > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
+
 # Copy data script (contains MySQL-specific functions like NOW())
 cp "$SRC_DATA" "$OUT_DATA"
 

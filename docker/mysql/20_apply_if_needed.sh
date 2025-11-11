@@ -42,6 +42,13 @@ sed -E \
   -e 's/CREATE OR REPLACE VIEW/CREATE VIEW IF NOT EXISTS/Ig' \
   "${SRC_DDL}" > "${OUT_DDL}"
 
+# Disable FK checks while dropping/creating to avoid order issues
+{
+  echo "SET FOREIGN_KEY_CHECKS=0;";
+  cat "${OUT_DDL}";
+  echo "SET FOREIGN_KEY_CHECKS=1;";
+} > "${OUT_DDL}.tmp" && mv "${OUT_DDL}.tmp" "${OUT_DDL}"
+
 cp "${SRC_DATA}" "${OUT_DATA}"
 
 echo "[DB-INIT] Loading schema into ${MYSQL_DATABASE}..."
