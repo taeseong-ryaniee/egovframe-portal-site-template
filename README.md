@@ -1,3 +1,7 @@
+docker compose로 빌드가능하게 함
+
+
+
 # 표준프레임워크 템플릿 프로젝트 포털 사이트
 
 ![java](https://img.shields.io/badge/java-007396?style=for-the-badge&logo=JAVA&logoColor=white)
