@@ -14,6 +14,7 @@ import org.egovframe.rte.fdl.security.userdetails.util.EgovUserDetailsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.ApplicationContext;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,8 +57,20 @@ public class EgovFileMngController {
         EgovFileMngController.cryptoService = cryptoService;
     }
     
-    @Autowired
+    @Autowired(required = false)
     private EgovFileMngService fileService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    private EgovFileMngService resolveFileService() {
+        if (fileService == null) {
+            try {
+                fileService = applicationContext.getBean(EgovFileMngService.class);
+            } catch (Exception ignore) {}
+        }
+        return fileService;
+    }
     
     // 주의 : 반드시 기본값 "egovframe"을 다른것으로 변경하여 사용하시기 바랍니다.
  	public static final String ALGORITHM_KEY = EgovProperties.getProperty("Globals.File.algorithmKey");
@@ -85,7 +98,7 @@ public class EgovFileMngController {
 		}
 		
 		fileVO.setAtchFileId(decodedAtchFileId);
-		List<FileVO> result = fileService.selectFileInfs(fileVO);
+        List<FileVO> result = resolveFileService().selectFileInfs(fileVO);
 
 		// FileId를 유추하지 못하도록 세션ID와 함께 암호화하여 표시한다. (2022.12.06 추가) - 파일아이디가 유추 불가능하도록 조치
 		for (FileVO file : result) {
@@ -128,7 +141,7 @@ public class EgovFileMngController {
 
 		fileVO.setAtchFileId(decodedAtchFileId);
 
-		List<FileVO> result = fileService.selectFileInfs(fileVO);
+        List<FileVO> result = resolveFileService().selectFileInfs(fileVO);
 
 		// FileId를 유추하지 못하도록 세션ID와 함께 암호화하여 표시한다. (2022.12.06 추가) - 파일아이디가 유추 불가능하도록 조치
 		for (FileVO file : result) {
