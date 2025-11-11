@@ -261,8 +261,12 @@
         <directory>${basedir}/target</directory>
 		<finalName>pst_webapp</finalName>
 
-        <!-- Include DB init scripts in the WAR -->
+        <!-- Resources: include default src/main/resources plus DB init scripts -->
         <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
             <resource>
                 <directory>${basedir}/DATABASE/oracle</directory>
                 <includes>
