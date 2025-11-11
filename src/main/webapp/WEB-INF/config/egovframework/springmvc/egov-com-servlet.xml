@@ -28,6 +28,8 @@
 
     <!-- Ensure propertiesService is available within servlet context for @Resource(name="propertiesService") in Controllers -->
     <import resource="classpath*:egovframework/spring/com/context-properties.xml"/>
+    <!-- Provide whitelist bean to servlet context for @Resource(name="egovPageLinkWhitelist") -->
+    <import resource="classpath*:egovframework/spring/com/context-whitelist.xml"/>
     <!-- MessageSource for servlet context (for EgovPropertyServiceImpl debug messages) -->
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basenames">
