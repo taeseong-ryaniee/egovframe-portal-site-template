@@ -61,6 +61,9 @@ sed -E -i 's/^CREATE TABLE ([A-Z0-9_]+)/CREATE TABLE IF NOT EXISTS \1/I' "${OUT_
 } > "${OUT_DDL}.tmp" && mv "${OUT_DDL}.tmp" "${OUT_DDL}"
 
 cp "${SRC_DATA}" "${OUT_DATA}"
+# Make IDS seed idempotent to avoid duplicate PK errors on re-runs
+sed -E -i '' 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "${OUT_DATA}" 2>/dev/null || \
+sed -E -i 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "${OUT_DATA}"
 
 # Recreate target database to avoid FK drop ordering issues
 echo "[DB-INIT] Recreating database ${MYSQL_DATABASE}..."

@@ -55,6 +55,9 @@ awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" 
 
 # Copy data script (contains MySQL-specific functions like NOW())
 cp "$SRC_DATA" "$OUT_DATA"
+# Make IDS seed idempotent to avoid duplicate PK errors on re-runs
+sed -E -i '' 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "$OUT_DATA" 2>/dev/null || \
+sed -E -i 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "$OUT_DATA"
 
 echo "[INIT] Recreating database: $MYSQL_DATABASE"
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE IF EXISTS \`$MYSQL_DATABASE\`; CREATE DATABASE \`$MYSQL_DATABASE\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
