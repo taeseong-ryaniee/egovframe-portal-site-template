@@ -9,6 +9,21 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!-- EgovPageLink 화이트리스트: 서블릿 컨텍스트에 직접 정의하여 가시성 보장 -->
+    <util:list id="egovPageLinkWhitelist" value-type="java.lang.String">
+        <value>main/sample_menu/EgovServiceIssuance</value>
+        <value>main/sample_menu/EgovServiceManage</value>
+        <value>main/sample_menu/EgovServiceResult</value>
+        <value>main/sample_menu/EgovAboutSite</value>
+        <value>main/sample_menu/EgovHistory</value>
+        <value>main/sample_menu/EgovOrganization</value>
+        <value>main/sample_menu/EgovLocation</value>
+        <value>main/sample_menu/Intro</value>
+        <value>main/inc/EgovIncHeaderOld</value>
+        <value>main/inc/EgovIncFooterOld</value>
+        <value>main/inc/EgovIncTborder</value>
+    </util:list>
+
     <!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
     <!-- Only scan Controllers in servlet context to avoid duplicating @Component beans -->
     <context:component-scan base-package="egovframework" use-default-filters="false">
