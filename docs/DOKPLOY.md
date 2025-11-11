@@ -1,6 +1,6 @@
 # Dokploy 배포 가이드 (Docker Compose)
 
-이 프로젝트는 Docker Compose 기반으로 Apache + Tomcat + MySQL 전체 스택을 배포합니다. Dokploy에서 "Docker Compose App"으로 등록하면 저장소에서 직접 빌드 후 구동할 수 있습니다.
+이 프로젝트는 Docker Compose 기반으로 Tomcat + MySQL 스택(기본) 또는 Apache + Tomcat + MySQL(옵션)을 배포합니다. Dokploy에서 "Docker Compose App"으로 등록하면 저장소에서 직접 빌드 후 구동할 수 있습니다.
 
 ## 1) 저장소 연결
 - Dokploy 대시보드 → Create Application → Docker Compose App
@@ -31,9 +31,9 @@
   - `docker/mysql/10_init.sh`가 Oracle DDL을 MySQL DDL로 변환 후 로드
 
 ## 5) 네트워킹/도메인
-- 기본으로 Apache가 80 포트를 리슨합니다.
-- Dokploy에서 도메인 연결/SSL(예: Let’s Encrypt)을 설정하면 HTTPS로 노출할 수 있습니다.
-- 플랫폼에서 자체 리버스 프록시를 쓰는 경우 Apache를 생략하고 Tomcat만 노출하는 구성도 가능합니다.
+- 기본 구성: Dokploy Ingress가 `tomcat:8080`으로 라우팅하도록 설정합니다.
+- WAR는 ROOT와 `/pst_webapp` 컨텍스트에 동시에 배포되어, 하드코딩된 `/pst_webapp/...` 링크도 정상 동작합니다.
+- SSL은 Dokploy에서 도메인/인증서를 설정하세요(예: Let’s Encrypt).
 
 ## 6) 배포
 - Deploy 실행 → 첫 배포는 의존성 다운로드/DB 초기화로 수 분 소요될 수 있습니다.
@@ -42,7 +42,7 @@
   - `tomcat` 로그: WAR 배포 및 기동 확인
 
 ## 7) 접속/계정
-- `http://<도메인>/`
+- `http://<도메인>/` 또는 `http://<도메인>/pst_webapp/`
 - 관리자: `admin / 1`, 사용자: `user1 / 1`
 
 ## 8) 운영 권장사항

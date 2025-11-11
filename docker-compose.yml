@@ -51,18 +51,7 @@ services:
       - "8080"
     restart: unless-stopped
 
-  apache:
-    image: httpd:2.4
-    container_name: pst_apache
-    depends_on:
-      tomcat:
-        condition: service_healthy
-    # No host port mapping; Dokploy ingress/front proxy should route to 80
-    expose:
-      - "80"
-    volumes:
-      - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
-    restart: unless-stopped
+  # Apache removed: Dokploy Ingress should route directly to tomcat:8080
 
 volumes:
   mysql_data:

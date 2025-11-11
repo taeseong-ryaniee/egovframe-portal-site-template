@@ -19,9 +19,10 @@ ENV TZ=Asia/Seoul \
 
 WORKDIR ${CATALINA_HOME}
 
-# Clean default ROOT and deploy our WAR as ROOT
+# Clean default ROOT and deploy our WAR both at ROOT and /pst_webapp
 RUN rm -rf webapps/ROOT
 COPY --from=build /app/target/pst_webapp.war webapps/ROOT.war
+COPY --from=build /app/target/pst_webapp.war webapps/pst_webapp.war
 
 # Ensure upload directory exists (mounted at runtime via volume)
 RUN mkdir -p /user/file/sht/
@@ -29,4 +30,3 @@ RUN mkdir -p /user/file/sht/
 EXPOSE 8080
 
 CMD ["bash", "-lc", "catalina.sh run"]
-
