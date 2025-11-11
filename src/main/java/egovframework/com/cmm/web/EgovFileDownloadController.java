@@ -10,6 +10,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,12 +56,12 @@ public class EgovFileDownloadController {
 	/** 로그설정 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovFileDownloadController.class);
 	
-	/** 암호화서비스 */
-	@Resource(name = "egovARIACryptoService")
-	EgovCryptoService cryptoService;
+    /** 암호화서비스 */
+    @Autowired
+    EgovCryptoService cryptoService;
 
-	@Resource(name = "EgovFileMngService")
-	private EgovFileMngService fileService;
+    @Autowired
+    private EgovFileMngService fileService;
 
 	// 주의 : 반드시 기본값 "egovframe"을 다른것으로 변경하여 사용하시기 바랍니다.
 	public static final String ALGORITHM_KEY = EgovProperties.getProperty("Globals.File.algorithmKey");

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,12 +51,12 @@ public class EgovFileMngController {
 	/** 암호화서비스 */
 	private static EgovCryptoService cryptoService;
 
-    @Resource(name = "egovARIACryptoService")
-	public void setEgovCryptoService(EgovCryptoService cryptoService) {
-		EgovFileMngController.cryptoService = cryptoService;
-	}
+    @Autowired
+    public void setEgovCryptoService(EgovCryptoService cryptoService) {
+        EgovFileMngController.cryptoService = cryptoService;
+    }
     
-    @Resource(name = "EgovFileMngService")
+    @Autowired
     private EgovFileMngService fileService;
     
     // 주의 : 반드시 기본값 "egovframe"을 다른것으로 변경하여 사용하시기 바랍니다.

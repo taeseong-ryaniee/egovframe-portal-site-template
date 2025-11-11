@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,8 +54,8 @@ public class EgovImageProcessController extends HttpServlet {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovImageProcessController.class);
 
-	@Resource(name = "EgovFileMngService")
-	private EgovFileMngService fileService;
+    @Autowired
+    private EgovFileMngService fileService;
 	
 	/** 암호화서비스 */
 	@Resource(name = "egovARIACryptoService")
