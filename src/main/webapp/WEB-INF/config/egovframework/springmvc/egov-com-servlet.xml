@@ -30,59 +30,7 @@
         </property> -->
     </bean>
 
-    <!-- Ensure propertiesService is available within servlet context for @Resource(name="propertiesService") in Controllers -->
-    <import resource="classpath*:egovframework/spring/com/context-properties.xml"/>
-    <!-- Provide cryptography beans for Controllers needing egovARIACryptoService -->
-    <bean id="egovPasswordEncoder" class="org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder">
-        <property name="algorithm" value="SHA-256"/>
-        <property name="hashedPassword" value="gdyYs/IZqY86VcWhT8emCYfqY1ahw2vtLG+/FzNqtrQ="/>
-    </bean>
-    <bean id="egovARIACryptoService" class="org.egovframe.rte.fdl.cryptography.impl.EgovARIACryptoServiceImpl">
-        <property name="passwordEncoder" ref="egovPasswordEncoder"/>
-        <property name="blockSize" value="1024"/>
-    </bean>
-
-    <!-- Provide whitelist bean directly in servlet context for @Resource(name='egovPageLinkWhitelist') -->
-    <bean id="egovPageLinkWhitelist" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <value>main/sample_menu/EgovServiceIssuance</value>
-                <value>main/sample_menu/EgovServiceManage</value>
-                <value>main/sample_menu/EgovServiceResult</value>
-                <value>main/sample_menu/EgovAboutSite</value>
-                <value>main/sample_menu/EgovHistory</value>
-                <value>main/sample_menu/EgovOrganization</value>
-                <value>main/sample_menu/EgovLocation</value>
-                <value>main/sample_menu/Intro</value>
-                <value>main/inc/EgovIncHeaderOld</value>
-                <value>main/inc/EgovIncFooterOld</value>
-                <value>main/inc/EgovIncTborder</value>
-            </list>
-        </constructor-arg>
-    </bean>
-    <!-- MessageSource for servlet context (for EgovPropertyServiceImpl debug messages) -->
-    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-        <property name="basenames">
-            <list>
-                <value>classpath:/egovframework/message/com/message-common</value>
-                <value>classpath:/org/egovframe/rte/fdl/idgnr/messages/idgnr</value>
-                <value>classpath:/org/egovframe/rte/fdl/property/messages/properties</value>
-            </list>
-        </property>
-        <property name="cacheSeconds" value="60"/>
-    </bean>
-    <!-- Fallback local definition (in case import fails in some containers) -->
-    <bean name="propertiesService" class="org.egovframe.rte.fdl.property.impl.EgovPropertyServiceImpl" destroy-method="destroy">
-        <property name="properties">
-            <map>
-                <entry key="pageUnit" value="10"/>
-                <entry key="pageSize" value="10"/>
-                <entry key="posblAtchFileSize" value="5242880"/>
-                <entry key="Globals.fileStorePath" value="/user/file/sht/"/>
-                <entry key="Globals.addedOptions" value="false"/>
-            </map>
-        </property>
-    </bean>
+    <!-- Remove infra beans from servlet context. Rely on root context only. -->
     
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="webBindingInitializer">

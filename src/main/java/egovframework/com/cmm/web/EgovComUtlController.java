@@ -3,6 +3,8 @@ package egovframework.com.cmm.web;
 import java.util.List;
 
 import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import javax.servlet.http.HttpSession;
 
 import org.egovframe.rte.fdl.property.EgovPropertyService;
@@ -38,10 +40,11 @@ public class EgovComUtlController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovComUtlController.class);
 	
 	/** EgovPropertyService */
-	@Resource(name = "propertiesService")
-	protected EgovPropertyService propertiesService;
+    @Autowired
+    protected EgovPropertyService propertiesService;
 
-	@Resource(name = "egovPageLinkWhitelist")
+    @Autowired
+    @Qualifier("egovPageLinkWhitelist")
     protected List<String> egovWhitelist;
 	
 	/**

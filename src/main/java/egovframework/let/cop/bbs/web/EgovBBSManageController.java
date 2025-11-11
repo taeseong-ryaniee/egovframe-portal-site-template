@@ -23,6 +23,7 @@ import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,23 +61,23 @@ import org.springmodules.validation.commons.DefaultBeanValidator;
 @Controller
 public class EgovBBSManageController {
 
-	@Resource(name = "EgovBBSManageService")
-	private EgovBBSManageService bbsMngService;
+    @Autowired
+    private EgovBBSManageService bbsMngService;
 
-	@Resource(name = "EgovBBSAttributeManageService")
-	private EgovBBSAttributeManageService bbsAttrbService;
+    @Autowired
+    private EgovBBSAttributeManageService bbsAttrbService;
 
     @Autowired
     private EgovFileMngService fileMngService;
 
-	@Resource(name = "EgovFileMngUtil")
-	private EgovFileMngUtil fileUtil;
+    @Autowired
+    private EgovFileMngUtil fileUtil;
 
-	@Resource(name = "propertiesService")
-	protected EgovPropertyService propertyService;
+    @Autowired
+    protected EgovPropertyService propertyService;
 
-	@Resource(name = "egovMessageSource")
-	EgovMessageSource egovMessageSource;
+    @Autowired
+    EgovMessageSource egovMessageSource;
 
 	@Autowired
 	private DefaultBeanValidator beanValidator;

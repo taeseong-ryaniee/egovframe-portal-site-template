@@ -56,23 +56,23 @@ import egovframework.let.cop.bbs.service.EgovBBSManageService;
 @Controller
 public class EgovBBSAdminManageController {
 
-	@Resource(name = "EgovBBSManageService")
-	private EgovBBSManageService bbsMngService;
+    @Autowired
+    private EgovBBSManageService bbsMngService;
 
-	@Resource(name = "EgovBBSAttributeManageService")
-	private EgovBBSAttributeManageService bbsAttrbService;
+    @Autowired
+    private EgovBBSAttributeManageService bbsAttrbService;
 
     @Autowired
     private EgovFileMngService fileMngService;
 
-	@Resource(name = "EgovFileMngUtil")
-	private EgovFileMngUtil fileUtil;
+    @Autowired
+    private EgovFileMngUtil fileUtil;
 
-	@Resource(name = "propertiesService")
-	protected EgovPropertyService propertyService;
+    @Autowired
+    protected EgovPropertyService propertyService;
 
-	@Resource(name = "egovMessageSource")
-	EgovMessageSource egovMessageSource;
+    @Autowired
+    EgovMessageSource egovMessageSource;
 
 	@Autowired
 	private DefaultBeanValidator beanValidator;
