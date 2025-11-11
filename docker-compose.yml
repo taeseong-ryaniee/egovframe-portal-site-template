@@ -69,7 +69,8 @@ services:
       MYSQL_HOST: ${MYSQL_HOST:-mysql}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-pst}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpw}
-    command: ["bash","-lc","chmod +x /init/20_apply_if_needed.sh && /init/20_apply_if_needed.sh"]
+    # 실행 비트가 없어도 동작하도록 bash로 스크립트를 직접 실행
+    command: ["bash","-lc","bash /init/20_apply_if_needed.sh"]
     volumes:
       - ./docker/mysql/20_apply_if_needed.sh:/init/20_apply_if_needed.sh:ro
       - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/init/src/all_pst_ddl_oracle.sql:ro
