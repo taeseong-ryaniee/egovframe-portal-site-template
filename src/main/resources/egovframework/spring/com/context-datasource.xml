@@ -17,6 +17,15 @@
         <property name="url" value="${Globals.Url}"/>
         <property name="username" value="${Globals.UserName}"/>
         <property name="password" value="${Globals.Password}"/>
+        <!-- 연결 안정성 설정 -->
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <property name="maxTotal" value="50"/>
+        <property name="maxIdle" value="20"/>
+        <property name="minIdle" value="5"/>
     </bean>
 
     <!-- 호환성 별칭: 일부 설정에서 dataSource 또는 dataSource-${Globals.DbType} 이름을 기대함 -->
