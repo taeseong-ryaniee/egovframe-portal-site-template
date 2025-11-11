@@ -40,7 +40,8 @@ services:
         condition: service_healthy
     environment:
       TZ: ${TZ:-Asia/Seoul}
-      JAVA_OPTS: ${JAVA_OPTS:- -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Xms128m -Xmx512m -Dfile.encoding=UTF-8}
+      # 개발용 전체 허용 프로파일 활성화(security-dev)
+      JAVA_OPTS: ${JAVA_OPTS:- -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Xms128m -Xmx512m -Dfile.encoding=UTF-8 -Dspring.profiles.active=security-dev}
     volumes:
       - upload_data:/user/file/sht/
     healthcheck:
