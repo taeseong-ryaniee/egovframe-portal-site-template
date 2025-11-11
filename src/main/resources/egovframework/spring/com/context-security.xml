@@ -89,10 +89,8 @@
 
     <!-- 개발용 전면 허용 프로파일: 인증/인가 미적용, CSRF 비활성화 -->
     <beans profile="security-dev">
-        <security:http auto-config="true" use-expressions="true">
-            <security:csrf disabled="true"/>
-            <security:intercept-url pattern="/**" access="permitAll"/>
-        </security:http>
+        <!-- 개발용: 모든 요청에 대해 보안 필터 미적용 (AuthenticationManager 불필요) -->
+        <security:http pattern="/**" security="none"/>
     </beans>
 
 </beans>
