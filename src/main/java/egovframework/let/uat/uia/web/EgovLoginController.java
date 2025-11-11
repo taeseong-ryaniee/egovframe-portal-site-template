@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
+import org.springframework.core.env.Environment;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,9 @@ public class EgovLoginController {
     @Resource(name="leaveaTrace")
     LeaveaTrace leaveaTrace;
 
+    @Resource
+    private Environment environment;
+
 	/**
 	 * 로그인 화면으로 들어간다
 	 * @param vo - 로그인후 이동할 URL이 담긴 LoginVO
@@ -96,6 +100,11 @@ public class EgovLoginController {
 
             // 2. spring security 연동
         	request.getSession().setAttribute("LoginVO", resultVO);
+
+            // 개발 프로파일(security-dev)에서는 보안 필터 연동을 생략하고 바로 메인으로
+            if (environment != null && environment.acceptsProfiles("security-dev")) {
+                return "forward:/cmm/main/mainPage.do";
+            }
 
         	UsernamePasswordAuthenticationFilter springSecurity = null;
 
