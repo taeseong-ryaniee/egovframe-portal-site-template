@@ -64,6 +64,8 @@ cp "${SRC_DATA}" "${OUT_DATA}"
 # Make IDS seed idempotent to avoid duplicate PK errors on re-runs
 sed -E -i '' 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "${OUT_DATA}" 2>/dev/null || \
 sed -E -i 's/^([[:space:]]*)INSERT[[:space:]]+INTO[[:space:]]+IDS\(/\1INSERT IGNORE INTO IDS(/I' "${OUT_DATA}"
+# Ensure client/session uses UTF-8 when loading seed data
+{ echo "SET NAMES utf8mb4;"; cat "${OUT_DATA}"; } > "${OUT_DATA}.tmp" && mv "${OUT_DATA}.tmp" "${OUT_DATA}"
 
 # Recreate target database to avoid FK drop ordering issues
 echo "[DB-INIT] Recreating database ${MYSQL_DATABASE}..."
@@ -71,14 +73,14 @@ mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "DROP DATABASE IF E
 
 echo "[DB-INIT] Loading schema into ${MYSQL_DATABASE}..."
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"
-mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DDL}"
+mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" --default-character-set=utf8mb4 "${MYSQL_DATABASE}" < "${OUT_DDL}"
 
 echo "[DB-INIT] Loading seed data into ${MYSQL_DATABASE}..."
-mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "${OUT_DATA}"
+mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" --default-character-set=utf8mb4 "${MYSQL_DATABASE}" < "${OUT_DATA}"
 
 if [[ -f "/init/src/post_init_mysql.sql" ]]; then
   echo "[DB-INIT] Applying post-init MySQL SQL..."
-  mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "/init/src/post_init_mysql.sql"
+  mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" --default-character-set=utf8mb4 "${MYSQL_DATABASE}" < "/init/src/post_init_mysql.sql"
 fi
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 

@@ -64,14 +64,16 @@ mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE IF EXISTS \`$MYSQL_DATAB
 
 echo "[INIT] Loading schema into database: $MYSQL_DATABASE"
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"
-mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DDL"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4 "$MYSQL_DATABASE" < "$OUT_DDL"
 
 echo "[INIT] Loading seed data..."
-mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$OUT_DATA"
+# Ensure client/session uses UTF-8 when loading seed data
+{ echo "SET NAMES utf8mb4;"; cat "$OUT_DATA"; } > "$OUT_DATA.tmp" && mv "$OUT_DATA.tmp" "$OUT_DATA"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4 "$MYSQL_DATABASE" < "$OUT_DATA"
 
 if [[ -f "/docker-entrypoint-initdb.d/src/post_init_mysql.sql" ]]; then
   echo "[INIT] Applying post-init MySQL SQL..."
-  mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "/docker-entrypoint-initdb.d/src/post_init_mysql.sql"
+  mysql -uroot -p"$MYSQL_ROOT_PASSWORD" --default-character-set=utf8mb4 "$MYSQL_DATABASE" < "/docker-entrypoint-initdb.d/src/post_init_mysql.sql"
 fi
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=1;"
 
