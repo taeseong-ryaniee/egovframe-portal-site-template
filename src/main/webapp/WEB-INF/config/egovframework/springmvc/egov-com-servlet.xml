@@ -15,11 +15,7 @@
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
-    <!-- Ensure required service/repository for file management are available in servlet context -->
-    <context:component-scan base-package="egovframework.com.cmm.service.impl" use-default-filters="false">
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
-    </context:component-scan>
+    <!-- Services are provided by parent (root) context; do NOT rescan here to avoid duplicate bean definitions. -->
 
     <!-- 서블릿컨네이너상의 exception에 대한 오류 페이지를 연결하는 mvc 설정 -->
     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
