@@ -25,6 +25,9 @@
             </props>
         </property> -->
     </bean>
+
+    <!-- Ensure propertiesService is available within servlet context for @Resource(name="propertiesService") in Controllers -->
+    <import resource="classpath*:egovframework/spring/com/context-properties.xml"/>
     
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="webBindingInitializer">
