@@ -31,6 +31,10 @@ sed -E \
   -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
   "$SRC_DDL" > "$OUT_DDL"
 
+# Ensure MySQL-compatible view syntax (just in case)
+sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL" 2>/dev/null || \
+sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "$OUT_DDL"
+
 # Ensure statements end with semicolons where needed (best-effort)
 awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" && mv "$OUT_DDL.tmp" "$OUT_DDL"
 
@@ -43,6 +47,9 @@ awk 'BEGIN{ORS=""} {print $0 "\n"} END{print "\n"}' "$OUT_DDL" > "$OUT_DDL.tmp" 
 
 # Copy data script (contains MySQL-specific functions like NOW())
 cp "$SRC_DATA" "$OUT_DATA"
+
+echo "[INIT] Recreating database: $MYSQL_DATABASE"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE IF EXISTS \`$MYSQL_DATABASE\`; CREATE DATABASE \`$MYSQL_DATABASE\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 echo "[INIT] Loading schema into database: $MYSQL_DATABASE"
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"

@@ -41,6 +41,10 @@ sed -E \
   -e 's/ DEFAULT SYSDATE/ DEFAULT CURRENT_TIMESTAMP/Ig' \
   "${SRC_DDL}" > "${OUT_DDL}"
 
+# Ensure MySQL-compatible view syntax
+sed -E -i '' 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}" 2>/dev/null || \
+sed -E -i 's/CREATE VIEW IF NOT EXISTS/CREATE OR REPLACE VIEW/Ig' "${OUT_DDL}"
+
 # Disable FK checks while dropping/creating to avoid order issues
 {
   echo "SET FOREIGN_KEY_CHECKS=0;";
@@ -49,6 +53,10 @@ sed -E \
 } > "${OUT_DDL}.tmp" && mv "${OUT_DDL}.tmp" "${OUT_DDL}"
 
 cp "${SRC_DATA}" "${OUT_DATA}"
+
+# Recreate target database to avoid FK drop ordering issues
+echo "[DB-INIT] Recreating database ${MYSQL_DATABASE}..."
+mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "DROP DATABASE IF EXISTS \`${MYSQL_DATABASE}\`; CREATE DATABASE \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 echo "[DB-INIT] Loading schema into ${MYSQL_DATABASE}..."
 mysql -h"${MYSQL_HOST}" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL FOREIGN_KEY_CHECKS=0;"
