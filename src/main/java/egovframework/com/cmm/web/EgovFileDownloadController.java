@@ -20,6 +20,7 @@ import org.egovframe.rte.fdl.security.userdetails.util.EgovUserDetailsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,8 +61,11 @@ public class EgovFileDownloadController {
     @Autowired
     EgovCryptoService cryptoService;
 
-    @Autowired
+    @Autowired(required = false)
     private EgovFileMngService fileService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
 	// 주의 : 반드시 기본값 "egovframe"을 다른것으로 변경하여 사용하시기 바랍니다.
 	public static final String ALGORITHM_KEY = EgovProperties.getProperty("Globals.File.algorithmKey");
@@ -141,7 +145,14 @@ public class EgovFileDownloadController {
 	@RequestMapping(value = "/cmm/fms/FileDown.do")
 	public void cvplFileDownload(@RequestParam Map<String, Object> commandMap, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+        // Lazy-resolve fileService from parent context if necessary
+        if (fileService == null) {
+            try {
+                fileService = applicationContext.getBean(EgovFileMngService.class);
+            } catch (Exception ignore) {}
+        }
+
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
 		if (isAuthenticated) {
 			
