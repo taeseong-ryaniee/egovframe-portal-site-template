@@ -2,6 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: pst_mysql
+    hostname: mysql
     command: ["mysqld", "--host_cache_size=0", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-pst}
@@ -50,9 +51,15 @@ services:
     expose:
       - "8080"
     restart: unless-stopped
+    networks:
+      - appnet
 
   # Apache removed: Dokploy Ingress should route directly to tomcat:8080
 
 volumes:
   mysql_data:
   upload_data:
+
+networks:
+  appnet:
+    driver: bridge

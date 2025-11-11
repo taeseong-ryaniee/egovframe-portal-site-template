@@ -28,4 +28,4 @@ RUN mkdir -p /user/file/sht/
 
 EXPOSE 8080
 
-CMD ["bash", "-lc", "catalina.sh run"]
+CMD ["bash", "-lc", "until getent hosts mysql >/dev/null; do echo '[WAIT] resolving mysql...'; sleep 1; done; catalina.sh run"]
