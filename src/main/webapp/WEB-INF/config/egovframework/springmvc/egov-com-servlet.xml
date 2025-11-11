@@ -28,6 +28,17 @@
 
     <!-- Ensure propertiesService is available within servlet context for @Resource(name="propertiesService") in Controllers -->
     <import resource="classpath*:egovframework/spring/com/context-properties.xml"/>
+    <!-- MessageSource for servlet context (for EgovPropertyServiceImpl debug messages) -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>classpath:/egovframework/message/com/message-common</value>
+                <value>classpath:/org/egovframe/rte/fdl/idgnr/messages/idgnr</value>
+                <value>classpath:/org/egovframe/rte/fdl/property/messages/properties</value>
+            </list>
+        </property>
+        <property name="cacheSeconds" value="60"/>
+    </bean>
     <!-- Fallback local definition (in case import fails in some containers) -->
     <bean name="propertiesService" class="org.egovframe.rte.fdl.property.impl.EgovPropertyServiceImpl" destroy-method="destroy">
         <property name="properties">
