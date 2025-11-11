@@ -9,6 +9,9 @@
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!-- Import whitelist so controllers can autowire egovPageLinkWhitelist -->
+    <import resource="classpath*:egovframework/spring/com/context-whitelist.xml"/>
+
     <!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
     <!-- Only scan Controllers in servlet context to avoid duplicating @Component beans -->
     <context:component-scan base-package="egovframework" use-default-filters="false">
