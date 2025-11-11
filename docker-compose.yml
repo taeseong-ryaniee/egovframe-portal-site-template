@@ -37,7 +37,7 @@ services:
         condition: service_healthy
     environment:
       TZ: ${TZ:-Asia/Seoul}
-      JAVA_OPTS: ${JAVA_OPTS:-"-Xms256m -Xmx1024m -Dfile.encoding=UTF-8"}
+      JAVA_OPTS: ${JAVA_OPTS:- -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Xms128m -Xmx512m -Dfile.encoding=UTF-8}
     volumes:
       - upload_data:/user/file/sht/
     healthcheck:
