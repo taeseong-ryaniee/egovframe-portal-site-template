@@ -40,6 +40,12 @@ services:
       JAVA_OPTS: ${JAVA_OPTS:-"-Xms256m -Xmx1024m -Dfile.encoding=UTF-8"}
     volumes:
       - upload_data:/user/file/sht/
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8080' "]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     # No host port mapping; Dokploy ingress/front proxy should route to 8080
     expose:
       - "8080"
@@ -49,7 +55,8 @@ services:
     image: httpd:2.4
     container_name: pst_apache
     depends_on:
-      - tomcat
+      tomcat:
+        condition: service_healthy
     # No host port mapping; Dokploy ingress/front proxy should route to 80
     expose:
       - "80"
