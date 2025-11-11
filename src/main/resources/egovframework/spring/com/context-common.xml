@@ -16,14 +16,14 @@
     <bean id="egovMessageSource" class="egovframework.com.cmm.EgovMessageSource">
         <property name="reloadableResourceBundleMessageSource">
             <ref bean="messageSource" />
-        </property> 
+        </property>
     </bean>
     
     <!-- 프로퍼티 파일 위치 설정 -->
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>classpath:/egovframework/message/com/message-common</value>
+                <value>classpath:/egovframework/message/com/message-com mon</value>
                 <value>classpath:/org/egovframe/rte/fdl/idgnr/messages/idgnr</value>
                 <value>classpath:/org/egovframe/rte/fdl/property/messages/properties</value>
             </list>

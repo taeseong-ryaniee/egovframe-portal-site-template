@@ -82,6 +82,12 @@
 			<version>${org.egovframe.rte.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.1.214</version>
+        </dependency>
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -254,6 +260,24 @@
         <defaultGoal>install</defaultGoal>
         <directory>${basedir}/target</directory>
 		<finalName>pst_webapp</finalName>
+
+        <!-- Include DB init scripts in the WAR -->
+        <resources>
+            <resource>
+                <directory>${basedir}/DATABASE/oracle</directory>
+                <includes>
+                    <include>all_pst_ddl_oracle.sql</include>
+                </includes>
+                <targetPath>db</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/DATABASE/mysql</directory>
+                <includes>
+                    <include>all_pst_data_mysql.sql</include>
+                </includes>
+                <targetPath>db</targetPath>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>

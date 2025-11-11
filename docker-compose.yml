@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pst_mysql
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pst}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpw}
+      MYSQL_USER: ${MYSQL_USER:-egov}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-egovpw}
+      TZ: ${TZ:-Asia/Seoul}
+    # In managed platforms (e.g., Dokploy), you can omit exposing 3306
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      # Init script that converts Oracle DDL to MySQL and loads data
+      - ./docker/mysql/10_init.sh:/docker-entrypoint-initdb.d/10_init.sh:ro
+      # Source DDL/DATA files (mounted under src to avoid auto-exec)
+      - ./DATABASE/oracle/all_pst_ddl_oracle.sql:/docker-entrypoint-initdb.d/src/all_pst_ddl_oracle.sql:ro
+      - ./DATABASE/mysql/all_pst_data_mysql.sql:/docker-entrypoint-initdb.d/src/all_pst_data_mysql.sql:ro
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    # 초기 스키마/데이터 자동 적용
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-prootpw"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  tomcat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pst_tomcat
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-Asia/Seoul}
+      JAVA_OPTS: ${JAVA_OPTS:-"-Xms256m -Xmx1024m -Dfile.encoding=UTF-8"}
+    volumes:
+      - upload_data:/user/file/sht/
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  apache:
+    image: httpd:2.4
+    container_name: pst_apache
+    depends_on:
+      - tomcat
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  upload_data:

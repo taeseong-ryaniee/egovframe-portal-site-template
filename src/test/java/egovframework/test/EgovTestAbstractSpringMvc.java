@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,11 +20,10 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.context.WebApplicationContext;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Spring MVC 테스트
- * 
+ *
  * @author 이백행
  * @since 2024-09-21
  */
@@ -43,107 +44,108 @@ import lombok.extern.slf4j.Slf4j;
 
 @ContextConfiguration({
 
-		"classpath*:egovframework/spring/com/context-*.xml",
+        "classpath*:egovframework/spring/com/context-*.xml",
 
-//		"classpath*:egovframework/spring/com/idgn/context-*.xml",
+//     "classpath*:egovframework/spring/com/idgn/context-*.xml",
 
-//		"classpath*:egovframework/spring/com/scheduling/context-*.xml",
+//     "classpath*:egovframework/spring/com/scheduling/context-*.xml",
 
-		"file:src/main/webapp/WEB-INF/config/egovframework/springmvc/egov-com-*.xml",
+        "file:src/main/webapp/WEB-INF/config/egovframework/springmvc/egov-com-*.xml",
 
 })
 
 @RequiredArgsConstructor
-@Slf4j
 
 public class EgovTestAbstractSpringMvc {
 
-	/**
-	 * BeforeClass AfterClass
-	 */
-	private static final StopWatch STOP_WATCH = new StopWatch();
+    protected static final Logger log = LoggerFactory.getLogger(EgovTestAbstractSpringMvc.class);
 
-	/**
-	 * Before After
-	 */
-	private final StopWatch stopWatch = new StopWatch();
+    /**
+     * BeforeClass AfterClass
+     */
+    private static final StopWatch STOP_WATCH = new StopWatch();
 
-	/**
-	 * beanDefinitionNames
-	 */
-	private static String[] beanDefinitionNames;
+    /**
+     * Before After
+     */
+    private final StopWatch stopWatch = new StopWatch();
 
-	/**
-	 * ApplicationContext
-	 */
-	@Autowired
-	private WebApplicationContext context;
+    /**
+     * beanDefinitionNames
+     */
+    private static String[] beanDefinitionNames;
 
-	/**
-	 * 서버 측 Spring MVC 테스트 지원을 위한 주요 진입점입니다.
-	 */
-	protected MockMvc mockMvc;
+    /**
+     * ApplicationContext
+     */
+    @Autowired
+    private WebApplicationContext context;
 
-	/**
-	 * setUpBeforeClass
-	 */
-	@BeforeAll
-	static void setUpBeforeClass() {
-		STOP_WATCH.start();
+    /**
+     * 서버 측 Spring MVC 테스트 지원을 위한 주요 진입점입니다.
+     */
+    protected MockMvc mockMvc;
 
-		log.debug("setUpBeforeClass start");
-	}
+    /**
+     * setUpBeforeClass
+     */
+    @BeforeAll
+    static void setUpBeforeClass() {
+        STOP_WATCH.start();
 
-	/**
-	 * tearDownAfterClass
-	 */
-	@AfterAll
-	static void tearDownAfterClass() {
-		STOP_WATCH.stop();
+        log.debug("setUpBeforeClass start");
+    }
 
-		if (log.isDebugEnabled()) {
-			log.debug("tearDownAfterClass stop");
+    /**
+     * tearDownAfterClass
+     */
+    @AfterAll
+    static void tearDownAfterClass() {
+        STOP_WATCH.stop();
 
-			log.debug("totalTimeMillis={}", STOP_WATCH.getTotalTimeMillis());
-			log.debug("totalTimeSeconds={}", STOP_WATCH.getTotalTimeSeconds());
-		}
-	}
+        if (log.isDebugEnabled()) {
+            log.debug("tearDownAfterClass stop");
 
-	/**
-	 * setUp
-	 */
-	@BeforeEach
-	void setUp() {
-		stopWatch.start();
+            log.debug("totalTimeMillis={}", STOP_WATCH.getTotalTimeMillis());
+            log.debug("totalTimeSeconds={}", STOP_WATCH.getTotalTimeSeconds());
+        }
+    }
 
-		log.debug("setUp start");
+    /**
+     * setUp
+     */
+    @BeforeEach
+    void setUp() {
+        stopWatch.start();
 
-		if (beanDefinitionNames == null) {
-			beanDefinitionNames = context.getBeanDefinitionNames();
-			for (final String beanDefinitionName : beanDefinitionNames) {
-				log.debug("beanDefinitionName={}", beanDefinitionName);
-			}
-			if (log.isDebugEnabled()) {
-				log.debug("length={}", beanDefinitionNames.length);
-			}
+        log.debug("setUp start");
 
-			mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-		}
-	}
+        if (beanDefinitionNames == null) {
+            beanDefinitionNames = context.getBeanDefinitionNames();
+            for (final String beanDefinitionName : beanDefinitionNames) {
+                log.debug("beanDefinitionName={}", beanDefinitionName);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("length={}", beanDefinitionNames.length);
+            }
 
-	/**
-	 * tearDown
-	 */
-	@AfterEach
-	void tearDown() {
-		stopWatch.stop();
+            mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        }
+    }
 
-		if (log.isDebugEnabled()) {
-			log.debug("tearDown stop");
+    /**
+     * tearDown
+     */
+    @AfterEach
+    void tearDown() {
+        stopWatch.stop();
 
-			log.debug("totalTimeMillis={}", stopWatch.getTotalTimeMillis());
-			log.debug("totalTimeSeconds={}", stopWatch.getTotalTimeSeconds());
-		}
-	}
+        if (log.isDebugEnabled()) {
+            log.debug("tearDown stop");
+
+            log.debug("totalTimeMillis={}", stopWatch.getTotalTimeMillis());
+            log.debug("totalTimeSeconds={}", stopWatch.getTotalTimeSeconds());
+        }
+    }
 
 }
