@@ -15,10 +15,12 @@ RUN chmod +x gradlew
 # Skip integration tests by default; enable with --build-arg RUN_TESTS=true once external
 # dependencies (MySQL, Selenium) are available in the build environment.
 ARG RUN_TESTS=false
-RUN if [ "$RUN_TESTS" = "true" ]; then \
-        ./gradlew clean build ; \
+RUN --mount=type=cache,target=/home/gradle/.gradle \
+    --mount=type=cache,target=/workspace/.gradle \
+    if [ "$RUN_TESTS" = "true" ]; then \
+        ./gradlew build ; \
     else \
-        ./gradlew clean build -x test ; \
+        ./gradlew build -x test ; \
     fi
 
 ##
