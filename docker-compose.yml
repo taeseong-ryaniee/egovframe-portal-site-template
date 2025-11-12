@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         RUN_TESTS: "false"
+        GRADLE_BASE_IMAGE: ${GRADLE_BASE_IMAGE:-gradle:8.5-jdk11}
     image: pst-webapp:latest
     container_name: pst-tomcat
     depends_on:

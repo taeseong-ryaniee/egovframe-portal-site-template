@@ -3,7 +3,8 @@
 ##
 ## Build stage
 ##
-FROM gradle:8.5-jdk11 AS build
+ARG GRADLE_BASE_IMAGE=gradle:8.5-jdk11
+FROM ${GRADLE_BASE_IMAGE} AS build
 
 WORKDIR /workspace
 

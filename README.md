@@ -123,3 +123,20 @@ mvn clean package
 # 3) Run (예: 임베디드 톰캣/와스 환경에 맞게)
 # mvn spring-boot:run  # (spring-boot 사용 시)
 # 또는 IDE에서 서버 실행 후 http://localhost:8080 접속
+
+## Docker Build Cache (Gradle)
+
+Docker 빌드 시간을 줄이고 싶다면 Gradle 캐시를 담아둔 베이스 이미지를 별도로 만든 뒤 재사용하면 된다.
+
+1. 캐시 이미지 생성
+   ```bash
+   docker build -f docker/base-images/Dockerfile.gradle-cache \
+     -t <your-registry>/gradle-8.5-cache:latest .
+   docker push <your-registry>/gradle-8.5-cache:latest
+   ```
+2. 배포 또는 `docker compose build` 전에 환경 변수 `GRADLE_BASE_IMAGE`를 해당 이미지로 지정한다.
+   ```bash
+   export GRADLE_BASE_IMAGE=<your-registry>/gradle-8.5-cache:latest
+   docker compose build
+   ```
+   Dokploy에서도 동일한 환경 변수를 빌드 설정에 추가하면, 이후 배포부터는 Gradle 배포본/의존성을 다시 다운로드하지 않아 빌드 시간이 크게 단축된다.
