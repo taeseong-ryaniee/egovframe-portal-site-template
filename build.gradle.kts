@@ -1,3 +1,12 @@
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+
+val egovVersion = "4.3.0"
+val springFrameworkVersion = "5.3.37"
+val springSecurityVersion = "5.7.11"
+val junitVersion = "5.11.0"
+val seleniumVersion = "4.13.0"
+val lombokVersion = "1.18.34"
+
 plugins {
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
@@ -7,8 +16,12 @@ plugins {
 
 group = "egov"
 version = "1.0.0"
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
 
 repositories {
     mavenCentral()
@@ -25,20 +38,23 @@ configurations {
 
 dependencies {
     // eGovFrame dependencies
-    implementation("org.egovframe.rte:org.egovframe.rte.ptl.mvc:4.3.0")
-    implementation("org.egovframe.rte:org.egovframe.rte.psl.dataaccess:4.3.0")
-    implementation("org.egovframe.rte:org.egovframe.rte.fdl.idgnr:4.3.0")
-    implementation("org.egovframe.rte:org.egovframe.rte.fdl.property:4.3.0")
-    implementation("org.egovframe.rte:org.egovframe.rte.fdl.crypto:4.3.0")
+    implementation("org.egovframe.rte:org.egovframe.rte.ptl.mvc:$egovVersion")
+    implementation("org.egovframe.rte:org.egovframe.rte.psl.dataaccess:$egovVersion")
+    implementation("org.egovframe.rte:org.egovframe.rte.fdl.idgnr:$egovVersion")
+    implementation("org.egovframe.rte:org.egovframe.rte.fdl.property:$egovVersion")
+    implementation("org.egovframe.rte:org.egovframe.rte.fdl.crypto:$egovVersion")
 
-    implementation("org.egovframe.rte:org.egovframe.rte.fdl.security:4.3.0") {
+    implementation("org.egovframe.rte:org.egovframe.rte.fdl.security:$egovVersion") {
         exclude(group = "org.springframework", module = "spring-jdbc")
     }
 
+    implementation(platform("org.springframework:spring-framework-bom:$springFrameworkVersion"))
+    implementation(platform("org.springframework.security:spring-security-bom:$springSecurityVersion"))
+
     // Spring Security
-    implementation("org.springframework.security:spring-security-core:5.7.11")
-    implementation("org.springframework.security:spring-security-config:5.7.11")
-    implementation("org.springframework.security:spring-security-web:5.7.11")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-web")
 
     // Database
     implementation("com.h2database:h2:2.1.214")
@@ -70,19 +86,20 @@ dependencies {
     }
 
     // Kotlin dependencies
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // Development tools
-    // compileOnly("org.projectlombok:lombok:1.18.34")
-    // annotationProcessor("org.projectlombok:lombok:1.18.34")
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
     // Test dependencies
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("org.seleniumhq.selenium:selenium-java:4.13.0")
-    testImplementation("org.springframework:spring-test:5.3.37")
+    testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumVersion")
+    testImplementation("org.springframework:spring-test:$springFrameworkVersion")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -94,10 +111,16 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<JavaCompile> {
     options.release.set(11)
+    options.encoding = "UTF-8"
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    if (!project.hasProperty("runIntegrationTests")) {
+        // Skip tests that require external services unless explicitly enabled.
+        exclude("egovframework/let/cop/bbs/**")
+        exclude("egovframework/let/uat/uia/web/EgovLoginControllerTestSelenium*")
+    }
 }
 
 tasks.war {
@@ -117,15 +140,10 @@ sourceSets {
     }
 }
 
-// Copy database scripts to resources
 tasks.processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from("DATABASE/oracle") {
-        include("all_pst_ddl_oracle.sql")
-        into("db")
-    }
-    from("DATABASE/mysql") {
-        include("all_pst_data_mysql.sql")
-        into("db")
-    }
+}
+
+tasks.processTestResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

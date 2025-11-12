@@ -96,8 +96,8 @@
 
 1. eclipse 하단의 Servers 탭을 클릭하고, 마우스 우클릭하여 **New > Server** 를 선택하여 서버를 설치한다.
 
-2. 생성 또는 복사된 소스 내부의 DATABASE 폴더 내 dml, ddl을 참고하여 연결하고자 하는 DB에 테이블 생성 및 기초 데이터를 생성한다.  
-   dml 및 ddl은 5가지 데이터베이스(Altibase, Cubrid, MySQL, Oracle, Tibero)를 지원한다.
+2. 생성 또는 복사된 소스 내부의 `src/main/resources/db` 폴더 내 DDL/DML 스크립트를 참고하여 연결하고자 하는 DB에 테이블 생성 및 기초 데이터를 생성한다.  
+   스크립트는 5가지 데이터베이스(Altibase, Cubrid, MySQL, Oracle, Tibero)를 지원한다.
 
 ![new_template_pst_run1](https://user-images.githubusercontent.com/3771788/229035205-cd5ad9a7-c8cf-43bf-ad2f-816aade1069a.jpg)
 
@@ -123,4 +123,3 @@ mvn clean package
 # 3) Run (예: 임베디드 톰캣/와스 환경에 맞게)
 # mvn spring-boot:run  # (spring-boot 사용 시)
 # 또는 IDE에서 서버 실행 후 http://localhost:8080 접속
-
